@@ -41,13 +41,13 @@ Connaître et maîtriser sa balance calorique est un outil central pour atteindr
 
 ### 🔍 Explorez les outils disponibles :
 
-#### 👉 [Calcul des besoins caloriques](#)
+#### 👉 Calcul des besoins caloriques
 Calculez facilement vos besoins énergétiques journaliers en fonction de votre âge, sexe, taille, poids et activité physique.
 
-#### 👉 [Calculateur simple des valeurs nutritionnelles](#)
+#### 👉 Calculateur simple des valeurs nutritionnelles
 Recherchez quelques aliments courants et obtenez rapidement leurs apports en calories, protéines, glucides et lipides.
 
-#### 👉 [Calculateur avancé basé sur la base CIQUAL](#)
+#### 👉 Calculateur avancé basé sur la base CIQUAL
 Explorez des milliers d’aliments et affinez votre suivi nutritionnel grâce à la base de données officielle française CIQUAL.
 
 ---
