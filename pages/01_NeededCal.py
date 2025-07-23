@@ -44,12 +44,12 @@ st.markdown("## 🧮 Entrez vos informations")
 col1, col2 = st.columns(2)
 with col1:
     sexe = st.radio("Sexe", ("Homme", "Femme"))
-    poids = st.number_input("Poids (kg)", min_value=30.0, max_value=250.0, value=70.0)
-    taille = st.number_input("Taille (cm)", min_value=100.0, max_value=250.0, value=175.0)
+    poids = st.number_input("Poids (kg)", min_value=30.0, max_value=250.0, value=70.0, step=0.1)
+    taille = st.number_input("Taille (cm)", min_value=100.0, max_value=250.0, value=175.0, step=0.1)
 with col2:
     age = st.number_input("Âge (années)", min_value=10, max_value=100, value=30)
-    masse_maigre = st.number_input("Masse maigre estimée (kg)", min_value=0.0, max_value=150.0, value=55.0)
-    nap = st.selectbox("Niveau d'activité (NAP)", options=[1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4], index=2)
+    masse_maigre = st.number_input("Masse maigre estimée (kg)", min_value=0.0, max_value=150.0, value=55.0, step=0.1)
+    nap = st.number_input("Niveau d'activité (NAP)", min_value=1.0, max_value=3.0, value=1.0, step=0.1)
 
 # ==== Calcul des MB ====
 
@@ -94,3 +94,37 @@ if st.button("Calculer mon métabolisme de base"):
 
     st.markdown(f"### 📊 Moyenne des estimations : **{moyenne} kcal/jour**")
     st.markdown(f"### 🔥 Besoins caloriques totaux (MB × NAP = DEJ) : **{round(moyenne * nap)} kcal/jour**")
+
+st.divider()
+st.markdown("## 🏋️‍♂️ Peut-on augmenter son métabolisme de base ?")
+
+st.markdown("""
+Oui, et c’est même l’un des leviers les plus puissants pour améliorer sa dépense énergétique au repos. Voici trois leviers efficaces :
+
+### 1️⃣ Musculation + cardio : le combo gagnant
+L’association **musculation + endurance** permet :
+- 🔼 Une augmentation de la **masse maigre** (musculation)
+- 🔽 Une réduction de la **masse grasse** (cardio)
+- 📉 Une diminution du **tour de taille**
+
+➡️ Plus la masse musculaire augmente, plus le métabolisme de base s’élève, car le muscle est actif même au repos.
+
+### 2️⃣ HIIT : l’effet post-effort
+Les **entraînements fractionnés à haute intensité** (HIIT) provoquent un phénomène appelé **EPOC** (Excess Post-Exercise Oxygen Consumption), qui augmente temporairement le métabolisme après l’effort.
+
+Pendant cette phase de récupération, le corps :
+- Recharge ses réserves énergétiques (ATP)
+- Élimine les déchets métaboliques (lactate)
+- Rééquilibre sa température et ses hormones de stress
+
+📌 Même si l’EPOC ne dure que quelques heures, l’intensité élevée de l’exercice contribue à un métabolisme plus actif.
+
+### 3️⃣ Le NEAT : bouger au quotidien
+Le **NEAT** correspond à toutes les dépenses énergétiques hors sport : marcher, se tenir debout, prendre les escaliers, etc.
+
+- Très variable selon les modes de vie (de 6 à 50 % de la dépense totale !)
+- Réduit en période de régime strict, ce qui peut ralentir les résultats
+- ✅ Un **NEAT élevé est un facteur protecteur** contre la reprise de poids
+
+💡 **Astuce** : Intégrer davantage de mouvement dans la journée (marche active, pauses dynamiques, escaliers...) peut avoir un effet significatif sur le métabolisme, sans effort structuré supplémentaire.
+""")

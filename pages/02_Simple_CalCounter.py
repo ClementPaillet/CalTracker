@@ -74,17 +74,21 @@ categories = df["Catégorie"].unique().tolist()
 if "selected_items" not in st.session_state:
     st.session_state.selected_items = []
 
-# Sélection d’un aliment
+# --------------------------- AJOUT À FAIRE ---------------------------
+# Sélection dynamique de la catégorie
+selected_category = st.selectbox("Catégorie :", categories)
+aliments_in_category = df[df["Catégorie"] == selected_category]["Aliment"].tolist()
+
+# Sélection dans un formulaire pour ajouter l’aliment
 st.markdown("### 1. Choisis tes aliments")
 with st.form("form"):
-    selected_category = st.selectbox("Catégorie :", categories)
-    aliments_in_category = df[df["Catégorie"] == selected_category]["Aliment"].tolist()
-    aliment = st.selectbox("Aliment :", aliments_in_category)
+    aliment = st.selectbox("Aliment :", aliments_in_category, key=selected_category)
     masse = st.number_input("Quantité consommée (en grammes)", min_value=1, max_value=1000, step=10)
     submitted = st.form_submit_button("Ajouter à la liste")
 
     if submitted:
         st.session_state.selected_items.append((aliment, masse))
+
 
 # Affichage des aliments sélectionnés
 st.markdown("### 2. Aliments sélectionnés")
