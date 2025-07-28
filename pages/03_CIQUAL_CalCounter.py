@@ -2,15 +2,39 @@ import streamlit as st
 import pandas as pd
 
 # Chargement de la base CIQUAL
+# @st.cache_data
+# def load_full_ciqual():
+#     df = pd.read_csv("Table-Ciqual-2020_FR_2020-07-07.csv", sep=",", encoding="utf-8")
+#     df = df[['alim_grp_nom_fr', 'alim_ssgrp_nom_fr', 'alim_ssssgrp_nom_fr', 'alim_nom_fr', 
+#              'Energie, Règlement UE N° 1169/2011 (kJ/100 g)', 'Energie, Règlement UE N° 1169/2011 (kcal/100 g)',
+#              'Protéines, N x facteur de Jones (g/100 g)', 'Glucides (g/100 g)', 'Lipides (g/100 g)']]
+#     return df.dropna(subset=['alim_nom_fr'])
 @st.cache_data
 def load_full_ciqual():
     df = pd.read_csv("Table-Ciqual-2020_FR_2020-07-07.csv", sep=",", encoding="utf-8")
     df = df[['alim_grp_nom_fr', 'alim_ssgrp_nom_fr', 'alim_ssssgrp_nom_fr', 'alim_nom_fr', 
-             'Energie, Règlement UE N° 1169/2011 (kJ/100 g)', 'Energie, Règlement UE N° 1169/2011 (kcal/100 g)',
-             'Protéines, N x facteur de Jones (g/100 g)', 'Glucides (g/100 g)', 'Lipides (g/100 g)']]
+             'Energie, Règlement UE N° 1169/2011 (kJ/100 g)', 
+             'Energie, Règlement UE N° 1169/2011 (kcal/100 g)',
+             'Protéines, N x facteur de Jones (g/100 g)', 
+             'Glucides (g/100 g)', 
+             'Lipides (g/100 g)']]
+
+    # Conversion des valeurs nutritionnelles en float
+    cols_nutrition = [
+        'Energie, Règlement UE N° 1169/2011 (kcal/100 g)',
+        'Protéines, N x facteur de Jones (g/100 g)', 
+        'Glucides (g/100 g)', 
+        'Lipides (g/100 g)'
+    ]
+    for col in cols_nutrition:
+        df[col] = df[col].str.replace(',', '.', regex=False)
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
     return df.dropna(subset=['alim_nom_fr'])
 
+
 df = load_full_ciqual()
+print("df:",df)
 
 st.title("Suivi nutritionnel - Base CIQUAL 🇫🇷")
 
@@ -44,6 +68,8 @@ else:
 
 # Boîte 4 : Aliments
 aliments = df_filtered_3["alim_nom_fr"].dropna().unique()
+print("aliment: ", aliments)
+print("df3:", df_filtered_3)
 selected_aliment = st.selectbox("Choix de l’aliment", sorted(aliments))
 
 st.session_state.selected_aliment = selected_aliment
@@ -60,8 +86,8 @@ if st.button("Ajouter à la liste"):
         "Quantité (g)": mass,
         "Calories": round(ligne['Energie, Règlement UE N° 1169/2011 (kcal/100 g)'] * mass / 100, 2),
         "Protéines": round(ligne['Protéines, N x facteur de Jones (g/100 g)'] * mass / 100, 2),
-        "Glucides": round(ligne['Glucides (g/100g)'] * mass / 100, 2),
-        "Lipides": round(ligne['Lipides (g/100g)'] * mass / 100, 2)
+        "Glucides": round(ligne['Glucides (g/100 g)'] * mass / 100, 2),
+        "Lipides": round(ligne['Lipides (g/100 g)'] * mass / 100, 2)
     })
 
 # 2. Affichage des aliments ajoutés
