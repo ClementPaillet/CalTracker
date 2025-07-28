@@ -34,7 +34,6 @@ def load_full_ciqual():
 
 
 df = load_full_ciqual()
-print("df:",df)
 
 st.title("Suivi nutritionnel - Base CIQUAL 🇫🇷")
 
@@ -68,8 +67,6 @@ else:
 
 # Boîte 4 : Aliments
 aliments = df_filtered_3["alim_nom_fr"].dropna().unique()
-print("aliment: ", aliments)
-print("df3:", df_filtered_3)
 selected_aliment = st.selectbox("Choix de l’aliment", sorted(aliments))
 
 st.session_state.selected_aliment = selected_aliment
