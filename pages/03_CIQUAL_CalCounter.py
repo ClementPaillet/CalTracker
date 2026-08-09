@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import unicodedata
 
 # Chargement de la base CIQUAL
 # @st.cache_data
@@ -33,9 +34,150 @@ def load_full_ciqual():
     return df.dropna(subset=['alim_nom_fr'])
 
 
+def normalize_text(text):
+    """
+    Normalise un texte pour faciliter la recherche :
+    - minuscules
+    - suppression des accents
+    """
+    if pd.isna(text):
+        return ""
+
+    text = str(text).lower()
+
+    return "".join(
+        c for c in unicodedata.normalize("NFD", text)
+        if unicodedata.category(c) != "Mn"
+    )
+
 df = load_full_ciqual()
 
+if "repas" not in st.session_state:
+    st.session_state.repas = []
+
 st.title("Suivi nutritionnel - Base CIQUAL 🇫🇷")
+
+# ============================================================
+# 🔎 RECHERCHE RAPIDE DANS TOUTE LA BASE CIQUAL
+# ============================================================
+
+st.markdown("## 🔎 Recherche rapide")
+
+st.caption(
+    "Commence à écrire le nom d'un aliment pour rechercher "
+    "directement dans toute la base CIQUAL."
+)
+
+# Création d'une colonne de recherche normalisée
+if "alim_nom_normalise" not in df.columns:
+    df["alim_nom_normalise"] = df["alim_nom_fr"].apply(normalize_text)
+
+# Barre de recherche
+search_query = st.text_input(
+    "Rechercher un aliment",
+    placeholder="Exemple : poulet, riz, tomate, fromage..."
+)
+
+# Résultats de recherche
+search_results = pd.DataFrame()
+
+if search_query.strip():
+
+    query_normalized = normalize_text(search_query.strip())
+
+    # Recherche dans le nom de l'aliment
+    search_results = df[
+        df["alim_nom_normalise"].str.contains(
+            query_normalized,
+            case=False,
+            na=False,
+            regex=False
+        )
+    ].copy()
+
+    # Nombre maximum de résultats affichés
+    search_results = search_results.head(30)
+
+    if len(search_results) > 0:
+
+        # Création d'un libellé plus informatif
+        search_results["label_recherche"] = (
+            search_results["alim_nom_fr"]
+            + " — "
+            + search_results["alim_ssgrp_nom_fr"].fillna("")
+        )
+
+        selected_search_label = st.selectbox(
+            "Résultats CIQUAL",
+            search_results["label_recherche"].tolist()
+        )
+
+        # Récupération de la ligne correspondant au résultat choisi
+        selected_search_row = search_results[
+            search_results["label_recherche"] == selected_search_label
+        ].iloc[0]
+
+        # Affichage des informations de l'aliment
+        st.info(
+            f"**{selected_search_row['alim_nom_fr']}**\n\n"
+            f"Groupe : {selected_search_row['alim_grp_nom_fr']}\n\n"
+            f"Sous-groupe : {selected_search_row['alim_ssgrp_nom_fr']}"
+        )
+
+        # Quantité
+        search_mass = st.number_input(
+            "Quantité consommée (g)",
+            min_value=1,
+            max_value=5000,
+            value=100,
+            step=10,
+            key="search_mass"
+        )
+
+        # Ajout au repas
+        if st.button(
+            "➕ Ajouter cet aliment",
+            key="add_search_food"
+        ):
+
+            st.session_state.repas.append({
+                "Nom": selected_search_row["alim_nom_fr"],
+                "Quantité (g)": search_mass,
+                "Calories": round(
+                    selected_search_row[
+                        "Energie, Règlement UE N° 1169/2011 (kcal/100 g)"
+                    ] * search_mass / 100,
+                    2
+                ),
+                "Protéines": round(
+                    selected_search_row[
+                        "Protéines, N x facteur de Jones (g/100 g)"
+                    ] * search_mass / 100,
+                    2
+                ),
+                "Glucides": round(
+                    selected_search_row[
+                        "Glucides (g/100 g)"
+                    ] * search_mass / 100,
+                    2
+                ),
+                "Lipides": round(
+                    selected_search_row[
+                        "Lipides (g/100 g)"
+                    ] * search_mass / 100,
+                    2
+                )
+            })
+
+            st.success(
+                f"{selected_search_row['alim_nom_fr']} "
+                f"({search_mass} g) ajouté au repas !"
+            )
+
+    else:
+        st.warning(
+            f"Aucun aliment trouvé pour « {search_query} »."
+        )
 
 # 1. Sélection des aliments
 st.markdown("## 🧭 Sélectionne un aliment via les catégories CIQUAL")
@@ -73,8 +215,8 @@ st.session_state.selected_aliment = selected_aliment
 
 mass = st.number_input("Quantité consommée (en grammes)", min_value=0, max_value=1000, step=10)
 
-if "repas" not in st.session_state:
-    st.session_state.repas = []
+#if "repas" not in st.session_state:
+#    st.session_state.repas = []
 
 if st.button("Ajouter à la liste"):
     ligne = df_filtered_3[df_filtered_3['alim_nom_fr'] == selected_aliment].iloc[0]

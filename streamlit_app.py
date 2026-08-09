@@ -1,5 +1,10 @@
 import streamlit as st
 
+from database import init_database
+from training import training_page
+
+init_database()
+
 # Configuration de la page
 st.set_page_config(page_title="Accueil - Mon site de nutrition", page_icon="🥦", layout="wide")
 
