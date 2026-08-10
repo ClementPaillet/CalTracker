@@ -158,6 +158,8 @@ if activity_type == "Course":
     # Initialisation de la liste dans session_state
     if "training_segments" not in st.session_state:
         st.session_state.training_segments = []
+    if "show_repeat_form" not in st.session_state:
+        st.session_state.show_repeat_form = False
 
     # ----------------------------------------------
     # Affichage des segments existants
@@ -225,15 +227,88 @@ if activity_type == "Course":
     # Ajouter un segment
     # ----------------------------------------------
 
-    if st.button("➕ Ajouter un segment"):
+    #if st.button("➕ Ajouter un segment"):
 
-        st.session_state.training_segments.append({
-            "name": "Nouveau segment",
-            "duration": 5,
-            "intensity": "Z2"
-        })
+        #st.session_state.training_segments.append({
+        #    "name": "Nouveau segment",
+        #    "duration": 5,
+        #    "intensity": "Z2"
+        #})
+#
+        #st.rerun()
 
-        st.rerun()
+    col_add, col_repeat = st.columns([1, 2])
+
+    # ---- 3.1️⃣  Segment unique -------------------------------------------------
+    with col_add:
+        if st.button("➕ Ajouter un segment"):
+            st.session_state.training_segments.append({
+                "name": "Nouveau segment",
+                "duration": 5,
+                "intensity": "Z2"
+            })
+            st.rerun()
+
+    # ---- 3.2️⃣  Segment répété (nouveau) ---------------------------------------
+    with col_repeat:
+        # On déclenche l’affichage du formulaire
+        if st.button("➕ Ajouter un segment répété"):
+            st.session_state.show_repeat_form = True
+            st.rerun()
+
+    # -----------------------------------------------------------------
+    # 4️⃣  Formulaire “segment répété” (affiché uniquement si demandé)
+    # -----------------------------------------------------------------
+    if st.session_state.get("show_repeat_form"):
+        st.subheader("🔁 Répéter un segment")
+        with st.form("repeat_form"):
+            # 4.1️⃣  Infos du segment
+            rep_name = st.text_input(
+                "Nom du segment",
+                value="Nouveau segment",
+                key="rep_name"
+            )
+            rep_duration = st.number_input(
+                "Durée (min)",
+                min_value=1,
+                value=5,
+                step=1,
+                key="rep_duration"
+            )
+            rep_intensity = st.selectbox(
+                "Intensité",
+                ["Z2", "Seuil", "Haute intensité", "Récupération"],
+                key="rep_intensity"
+            )
+            # 4.2️⃣  Nombre de répétitions
+            rep_count = st.number_input(
+                "Répéter ce segment",
+                min_value=1,
+                max_value=30,
+                value=2,
+                step=1,
+                key="rep_count"
+            )
+            # 4.3️⃣  Boutons du formulaire
+            submitted = st.form_submit_button("Ajouter")
+            cancelled = st.form_submit_button("Annuler")
+
+        # -----------------------------------------------------------------
+        # 5️⃣  Traitement du formulaire
+        # -----------------------------------------------------------------
+        if submitted:
+            for _ in range(int(rep_count)):
+                st.session_state.training_segments.append({
+                    "name": rep_name,
+                    "duration": rep_duration,
+                    "intensity": rep_intensity
+                })
+            st.session_state.show_repeat_form = False
+            st.rerun()
+
+        if cancelled:
+            st.session_state.show_repeat_form = False
+            st.rerun()
 
     # ----------------------------------------------
     # Résumé de la séance
@@ -275,7 +350,7 @@ if activity_type == "Course":
             if segment["intensity"] == "Récupération"
         )
 
-        st.markdown("### 📊 Résumé")
+        st.markdown("### 📊 Résuméééééé")
 
         col1, col2, col3, col4 = st.columns(4)
 
