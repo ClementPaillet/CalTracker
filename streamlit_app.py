@@ -1,7 +1,7 @@
 import streamlit as st
 
 from database import init_database
-from training import training_page
+#from pages.training import training_page
 
 init_database()
 
@@ -9,7 +9,7 @@ init_database()
 st.set_page_config(page_title="Accueil - Mon site de nutrition", page_icon="🥦", layout="wide")
 
 # Titre principal
-st.title("🥗 Bienvenue sur votre assistant nutrition")
+st.title("🥗 Bienvenue sur votre assistant nutrition et sport 🏃")
 
 # Sous-titre
 st.subheader("Comprendre les bases de la nutrition pour mieux manger")
@@ -54,6 +54,9 @@ Recherchez quelques aliments courants et obtenez rapidement leurs apports en cal
 
 #### 👉 Calculateur avancé basé sur la base CIQUAL
 Explorez des milliers d’aliments et affinez votre suivi nutritionnel grâce à la base de données officielle française CIQUAL.
+
+#### 👉 Calendrier pour tracker les performances sportives
+Créer tes propres entraînements, ton planning et suis ta progression.
 
 ---
 """)
