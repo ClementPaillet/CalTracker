@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import calendar
+import altair as alt
 
 from datetime import date, timedelta
 
@@ -520,7 +521,7 @@ with col1:
 
     st.bar_chart(
         sessions_chart,
-        use_container_width=True
+        width="stretch"
     )
 
 
@@ -551,7 +552,7 @@ with col2:
 
     st.bar_chart(
         duration_chart,
-        use_container_width=True
+        width="stretch"
     )
 
 
@@ -618,7 +619,7 @@ summary = summary[
 st.dataframe(
     summary,
     hide_index=True,
-    use_container_width=True
+    width="stretch"
 )
 
 
@@ -736,7 +737,7 @@ if not running.empty:
 
         st.bar_chart(
             intensity_chart,
-            use_container_width=True
+            width="stretch"
         )
 
 
@@ -789,26 +790,87 @@ if not running.empty:
         # Donut via dataframe pour graphique
         # ----------------------------------------------------
 
-        st.markdown(
-            "### 🥧 Répartition relative"
+        #st.markdown(
+        #    "### 🥧 Répartition relative"
+        #)
+#
+#
+        #pie_data = (
+        #    intensity_duration[
+        #        intensity_duration > 0
+        #    ]
+        #    .to_frame("Minutes")
+        #)
+#
+        #if not pie_data.empty:
+#
+        #    st.bar_chart(
+        #        pie_data,
+        #        width="stretch"
+        #    )
+
+        # ----------------------------------------------------
+        # Donut via dataframe pour graphique
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # 2️⃣  Préparer le DataFrame
+        # ----------------------------------------------------
+        pie_df = (
+            intensity_duration[intensity_duration > 0]   # garder >0
+            .to_frame("Minutes")                         # DataFrame avec colonne Minutes
+            .reset_index()                               # mettre l'index (intensity) en colonne
+            .rename(columns={"index": "intensity"})      # nom explicite
         )
 
+        # ----------------------------------------------------
+        # 3️⃣  Titre Streamlit
+        # ----------------------------------------------------
+        st.markdown("### 🥧 Répartition relative")
 
-        pie_data = (
-            intensity_duration[
-                intensity_duration > 0
-            ]
-            .to_frame("Minutes")
-        )
+        # ----------------------------------------------------
+        # 4️⃣  Vérifier qu’on a des données
+        # ----------------------------------------------------
+        if not pie_df.empty:
 
+            # ------------------------------------------------
+            # 5️⃣  Créer le camembert (donut) Altair
+            # ------------------------------------------------
+            # 5.1 – Calculer le pourcentage (optionnel, pour affichage)
+            pie_df["percent"] = (
+                pie_df["Minutes"] / pie_df["Minutes"].sum()
+            ) * 100
 
-        if not pie_data.empty:
-
-            st.bar_chart(
-                pie_data,
-                use_container_width=True
+            # 5.2 – Chart
+            chart = (
+                alt.Chart(pie_df)
+                .mark_arc(innerRadius=50)                # <‑‑ 0 → vrai camembert, >0 → donut
+                .encode(
+                    # Taille de chaque part
+                    angle=alt.Angle("Minutes:Q", sort=None),
+                    # Couleur = intensité (catégorique)
+                    color=alt.Color(
+                        "intensity:N",
+                        title="Intensité",
+                    ),
+                    # Etiquette texte (pourcentage + libellé)
+                    tooltip=[
+                        "intensity:N",
+                        "Minutes:Q",
+                        alt.Tooltip("percent:Q", format=".1f", title="%")
+                    ]
+                )
+                # Optionnel : légende + titre
+                .properties(
+                    width=400,
+                    height=400,
+                    title="Répartition des minutes par intensité"
+                )
             )
 
+            # ------------------------------------------------
+            # 6️⃣  Afficher le graphique dans Streamlit
+            # ------------------------------------------------
+            st.altair_chart(chart, use_container_width=True)
 
     else:
 
@@ -860,7 +922,7 @@ with col1:
 
     st.line_chart(
         weekly["Minutes"],
-        use_container_width=True
+        width="stretch"
     )
 
 
@@ -872,7 +934,7 @@ with col2:
 
     st.bar_chart(
         weekly["Séances"],
-        use_container_width=True
+        width="stretch"
     )
 
 
@@ -906,7 +968,7 @@ if not running.empty:
 
     st.line_chart(
         running_weekly,
-        use_container_width=True
+        width="stretch"
     )
 
 
@@ -1019,7 +1081,7 @@ daily = daily.rename(
 
 st.bar_chart(
     daily,
-    use_container_width=True
+    width="stretch"
 )
 
 
@@ -1091,5 +1153,5 @@ display_df = display_df.sort_values(
 st.dataframe(
     display_df,
     hide_index=True,
-    use_container_width=True
+    width="stretch"
 ) 
