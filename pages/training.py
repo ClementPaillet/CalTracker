@@ -9,6 +9,11 @@ from database import (
     get_segments
 )
 
+st.set_page_config(
+    page_title="Base d'entraînements",
+    page_icon="🏃",
+    layout="wide"
+)
 
 # ============================================================
 # PAGE : BANQUE D'ACTIVITÉS

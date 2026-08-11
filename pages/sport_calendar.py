@@ -10,8 +10,8 @@ from datetime import date
 DB_NAME = "training.db"
 
 st.set_page_config(
-    page_title="Entraînement",
-    page_icon="🏃",
+    page_title="Calendrier d'entraînements",
+    page_icon="📅",
     layout="wide"
 )
 

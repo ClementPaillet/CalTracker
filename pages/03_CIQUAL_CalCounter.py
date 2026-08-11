@@ -1,6 +1,13 @@
+# ➕🍽️➕ Calculateur de Macros - Complet
+
 import streamlit as st
 import pandas as pd
 import unicodedata
+
+st.set_page_config(
+    page_title="Calculateur de Macros - Complet",
+    page_icon="🍽️",
+)
 
 # Chargement de la base CIQUAL
 # @st.cache_data

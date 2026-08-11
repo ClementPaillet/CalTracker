@@ -1,6 +1,11 @@
 import streamlit as st
 import pandas as pd
 
+st.set_page_config(
+    page_title="Calculateur de Macros - Simple",
+    page_icon="🍽️",
+)
+
 # ---------------------------
 # Base de données des aliments
 # ---------------------------
@@ -63,7 +68,6 @@ df = pd.DataFrame(data)
 # ---------------------------
 # Interface utilisateur
 # ---------------------------
-st.set_page_config(page_title="Calculateur Nutritionnel", layout="centered")
 st.title("🍽️ Calculateur Nutritionnel")
 st.markdown("Ajoute les aliments consommés et leur quantité en grammes.")
 
