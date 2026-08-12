@@ -870,7 +870,7 @@ if not running.empty:
             # ------------------------------------------------
             # 6️⃣  Afficher le graphique dans Streamlit
             # ------------------------------------------------
-            st.altair_chart(chart, use_container_width=True)
+            st.altair_chart(chart, width="stretch")
 
     else:
 

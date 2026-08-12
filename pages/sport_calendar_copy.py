@@ -479,7 +479,7 @@ with col_previous:
 
     if st.button(
         "⬅️ Mois précédent",
-        use_container_width=True
+        width="stretch"
     ):
 
         if st.session_state.calendar_month == 1:
@@ -524,7 +524,7 @@ with col_next:
 
     if st.button(
         "Mois suivant ➡️",
-        use_container_width=True
+        width="stretch"
     ):
 
         if st.session_state.calendar_month == 12:
@@ -741,7 +741,7 @@ for week in weeks:
             if st.button(
                 "＋ Ajouter",
                 key=f"add_{current_date_str}",
-                use_container_width=True
+                width="stretch"
             ):
 
                 st.session_state.selected_date = (
@@ -871,7 +871,7 @@ if st.session_state.selected_date:
             if st.button(
                 "✅ Ajouter au calendrier",
                 type="primary",
-                use_container_width=True
+                width="stretch"
             ):
 
                 add_to_calendar(
@@ -895,7 +895,7 @@ if st.session_state.selected_date:
 
             if st.button(
                 "❌ Annuler",
-                use_container_width=True
+                width="stretch"
             ):
 
                 st.session_state.selected_date = None

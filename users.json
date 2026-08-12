@@ -9,6 +9,18 @@
     "sexe": "H",
     "bodycount": 1,
     "emoji": "🛰️",
-    "description": "Dieu grec en devenir. καλὸς κἀγαθός"
+    "description": "Dieu grec en devenir.\n - καλὸς κἀγαθός -"
+  },
+  "nico": {
+    "nom": "Turck",
+    "prenom": "Nicolas",
+    "surnom": "Le gros charo",
+    "age": 25,
+    "taille_cm": 176,
+    "poids_kg": 74,
+    "sexe": "H",
+    "bodycount": 19,
+    "emoji": "☭🟥",
+    "description": "Impatience dans le coeur, discipline dans le corps."
   }
 }

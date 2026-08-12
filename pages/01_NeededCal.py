@@ -95,7 +95,7 @@ if st.button("Calculer mon métabolisme de base"):
     df = pd.DataFrame(resultats.items(), columns=["Formule", "MB (kcal/jour)"])
     moyenne = round(df["MB (kcal/jour)"].mean(), 1)
     st.success("✅ Résultats du métabolisme de base")
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width="stretch")
 
     st.markdown(f"### 📊 Moyenne des estimations : **{moyenne} kcal/jour**")
     st.markdown(f"### 🔥 Besoins caloriques totaux (MB × NAP = DEJ) : **{round(moyenne * nap)} kcal/jour**")

@@ -240,11 +240,11 @@ if st.button("Ajouter à la liste"):
 if st.session_state.repas:
     st.subheader("Résumé du repas")
     df_repas = pd.DataFrame(st.session_state.repas)
-    st.dataframe(df_repas, use_container_width=True)
+    st.dataframe(df_repas, width="stretch")
 
     total = df_repas[['Calories', 'Protéines', 'Glucides', 'Lipides']].sum().to_frame().T
     total.index = ['Total']
-    st.dataframe(total, use_container_width=True)
+    st.dataframe(total, width="stretch")
 
 # 3. Réinitialisation
 if st.button("Réinitialiser le repas"):
