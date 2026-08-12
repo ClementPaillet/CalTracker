@@ -1,0 +1,14 @@
+{
+  "db_teuteu": {
+    "nom": "Paillet",
+    "prenom": "Clément",
+    "surnom": "Teuteu",
+    "age": 25,
+    "taille_cm": 178,
+    "poids_kg": 77,
+    "sexe": "H",
+    "bodycount": 1,
+    "emoji": "🛰️",
+    "description": "Dieu grec en devenir. καλὸς κἀγαθός"
+  }
+}
