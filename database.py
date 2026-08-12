@@ -1,6 +1,7 @@
 import sqlite3
 
 DB_NAME = "training.db"
+DB_NAME = "training.db"
 
 
 def get_connection():

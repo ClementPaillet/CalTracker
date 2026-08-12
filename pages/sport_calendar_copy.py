@@ -2,12 +2,12 @@ import streamlit as st
 import sqlite3
 import calendar
 from datetime import date
+from pathlib import Path
+
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
-
-DB_NAME = "training.db"
 
 st.set_page_config(
     page_title="Calendrier d'entraînements",
@@ -17,12 +17,79 @@ st.set_page_config(
 
 
 # ============================================================
+# DÉTECTION DES BASES DE DONNÉES
+# ============================================================
+
+DATABASE_FILES = sorted(
+    Path(".").glob("training_*.db")
+)
+
+if not DATABASE_FILES:
+
+    st.error(
+        "Aucune base de données trouvée.\n\n"
+        "Crée au moins une base du type "
+        "`training_user1.db`."
+    )
+
+    st.stop()
+
+
+# ============================================================
+# CRÉATION DU DICTIONNAIRE DES UTILISATEURS
+# ============================================================
+
+# Exemple :
+#
+# training_clement.db -> Clement
+# training_antoine.db -> Antoine
+#
+DATABASES = {
+    db.stem.replace("training_", ""): str(db)
+    for db in DATABASE_FILES
+}
+
+
+# ============================================================
+# SÉLECTION DE LA BASE
+# ============================================================
+
+st.title("📅 Calendrier d'entraînement")
+
+st.markdown(
+    "Planifie tes séances à partir de ta banque d'activités."
+)
+
+
+st.subheader("👤 Utilisateur")
+
+selected_user = st.selectbox(
+    "Sélectionner l'utilisateur",
+    options=list(DATABASES.keys())
+)
+
+
+# Base actuellement utilisée
+DB_NAME = DATABASES[selected_user]
+
+
+st.caption(
+    f"Base utilisée : `{DB_NAME}`"
+)
+
+
+# ============================================================
 # BASE DE DONNÉES
 # ============================================================
 
 def get_connection():
+
     return sqlite3.connect(DB_NAME)
 
+
+# ============================================================
+# RÉCUPÉRATION DES ACTIVITÉS
+# ============================================================
 
 def get_activities():
     """
@@ -52,6 +119,10 @@ def get_activities():
     return activities
 
 
+# ============================================================
+# RÉCUPÉRATION D'UNE ACTIVITÉ
+# ============================================================
+
 def get_activity(activity_id):
     """
     Récupère une activité précise.
@@ -79,6 +150,9 @@ def get_activity(activity_id):
     return activity
 
 
+# ============================================================
+# RÉCUPÉRATION DU CALENDRIER
+# ============================================================
 def get_calendar_activities(year, month):
     """
     Récupère toutes les activités programmées
@@ -119,9 +193,17 @@ def get_calendar_activities(year, month):
     return activities
 
 
-def add_to_calendar(activity_id, selected_date):
+# ============================================================
+# AJOUT AU CALENDRIER
+# ============================================================
+
+def add_to_calendar(
+    activity_id,
+    selected_date
+):
     """
-    Ajoute une activité à une date.
+    Ajoute une activité à une date
+    dans la base actuellement sélectionnée.
     """
 
     conn = get_connection()
@@ -140,6 +222,9 @@ def add_to_calendar(activity_id, selected_date):
     conn.close()
 
 
+# ============================================================
+# SUPPRESSION DU CALENDRIER
+# ============================================================
 def delete_from_calendar(calendar_id):
     """
     Supprime une activité du calendrier.
@@ -155,7 +240,6 @@ def delete_from_calendar(calendar_id):
 
     conn.commit()
     conn.close()
-
 
 # ============================================================
 # FONCTIONS UTILITAIRES
@@ -238,43 +322,41 @@ def activity_cell(activity: dict) -> None:
             unsafe_allow_html=True,
         )
 
-def render_activity_line(activity: dict) -> None:
-    """
-    Render one activity inside the light‑gray box **and** put the delete
-    button on the same line (right‑aligned).
+# ============================================================
+# AFFICHAGE D'UNE ACTIVITÉ
+# ============================================================
 
-    Parameters
-    ----------
-    activity : dict
-        The dictionary you built in the `activities_by_date` loop:
-        {
-            "calendar_id": …,
-            "activity_id": …,
-            "name": …,
-            "type": …,
-            "format": …,
-            "duration": …
-        }
-    """
-    # -----------------------------------------------------------------
-    # 1️⃣  Build the textual part (icon, name, duration)
-    # -----------------------------------------------------------------
-    icon = activity_icon(activity["type"])
-    duration = format_duration(activity["duration"])
-    txt = f"**{icon} {activity['name']}**  {duration}"
+def render_activity_line(
+    activity: dict
+) -> None:
 
-    # -----------------------------------------------------------------
-    # 2️⃣  Whole line = container + two columns
-    # -----------------------------------------------------------------
-    # The outer container gives us the light‑gray background.
+    icon = activity_icon(
+        activity["type"]
+    )
+
+    duration = format_duration(
+        activity["duration"]
+    )
+
+    txt = (
+        f"**{icon} {activity['name']}** "
+        f"{duration}"
+    )
+
     container = st.container()
-    with container:
-        # Two columns: left = text, right = delete button
-        col_text, col_btn = st.columns([0.9, 0.1])
 
-        # ---- Left column : activity description (plain markdown) ----
+    with container:
+
+        col_text, col_btn = st.columns(
+            [0.9, 0.1]
+        )
+
+        # ----------------------------------------------------
+        # Description
+        # ----------------------------------------------------
+
         with col_text:
-            # We keep the same style you had for the activity box
+
             st.markdown(
                 f"""
                 <div style="
@@ -289,18 +371,24 @@ def render_activity_line(activity: dict) -> None:
                 unsafe_allow_html=True,
             )
 
-        # ---- Right column : delete button (tiny, no label) ----
+        # ----------------------------------------------------
+        # Bouton suppression
+        # ----------------------------------------------------
+
         with col_btn:
-            # The key must be unique → use the calendar row id
+
             if st.button(
                 "✕",
                 key=f"delete_{activity['calendar_id']}",
-                help="Supprimer cette séance",
-                # make the button as small as possible
-                #style="font-size:12px; padding:0.2rem 0.4rem;",
+                help="Supprimer cette séance"
             ):
-                delete_from_calendar(activity["calendar_id"])
+
+                delete_from_calendar(
+                    activity["calendar_id"]
+                )
+
                 st.rerun()
+
 
 # ============================================================
 # INITIALISATION SESSION STATE
@@ -320,17 +408,6 @@ if "selected_date" not in st.session_state:
 
 
 # ============================================================
-# TITRE
-# ============================================================
-
-st.title("📅 Calendrier d'entraînement")
-
-st.markdown(
-    "Planifie tes séances à partir de ta banque d'activités."
-)
-
-
-# ============================================================
 # NAVIGATION DU MOIS
 # ============================================================
 
@@ -338,6 +415,10 @@ col_previous, col_title, col_next = st.columns(
     [1, 4, 1]
 )
 
+
+# ============================================================
+# MOIS PRÉCÉDENT
+# ============================================================
 
 with col_previous:
 
@@ -358,22 +439,31 @@ with col_previous:
         st.rerun()
 
 
+# ============================================================
+# TITRE DU MOIS
+# ============================================================
+
 with col_title:
 
     month_name = calendar.month_name[
         st.session_state.calendar_month
     ]
 
-    # Mise en majuscules
     month_name = month_name.capitalize()
 
     st.markdown(
-        f"<h2 style='text-align:center;'>"
-        f"{month_name} {st.session_state.calendar_year}"
-        f"</h2>",
+        f"""
+        <h2 style='text-align:center;'>
+            {month_name} {st.session_state.calendar_year}
+        </h2>
+        """,
         unsafe_allow_html=True
     )
 
+
+# ============================================================
+# MOIS SUIVANT
+# ============================================================
 
 with col_next:
 
@@ -402,7 +492,6 @@ calendar_activities = get_calendar_activities(
     st.session_state.calendar_year,
     st.session_state.calendar_month
 )
-
 
 # Dictionnaire :
 #
@@ -442,14 +531,11 @@ for activity in calendar_activities:
         }
     )
 
-
-# ============================================================
-# CALENDRIER
-# ============================================================
-
 st.divider()
 
-# Noms des jours
+# ============================================================
+# ORGANISATION PAR DATE
+# ============================================================
 days = [
     "Lundi",
     "Mardi",
@@ -460,26 +546,39 @@ days = [
     "Dimanche"
 ]
 
-# En-tête
+
+# ============================================================
+# EN-TÊTE DES JOURS
+# ============================================================
+
 header = st.columns(7)
+
 
 for i, day in enumerate(days):
 
     with header[i]:
 
         st.markdown(
-            f"<div style='text-align:center;"
-            f"font-weight:bold;'>"
-            f"{day}"
-            f"</div>",
+            f"""
+            <div style="
+                text-align:center;
+                font-weight:bold;
+            ">
+                {day}
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
 
-# Calendrier Python
+# ============================================================
+# GÉNÉRATION DU CALENDRIER
+# ============================================================
+
 cal = calendar.Calendar(
     firstweekday=0
 )
+
 
 weeks = cal.monthdayscalendar(
     st.session_state.calendar_year,
@@ -491,11 +590,15 @@ for week in weeks:
 
     columns = st.columns(7)
 
+
     for day_index, day_number in enumerate(week):
 
         with columns[day_index]:
 
+            # ------------------------------------------------
             # Jour inexistant
+            # ------------------------------------------------
+
             if day_number == 0:
 
                 st.markdown(
@@ -505,23 +608,29 @@ for week in weeks:
 
                 continue
 
+
             current_date = date(
                 st.session_state.calendar_year,
                 st.session_state.calendar_month,
                 day_number
             )
 
-            current_date_str = current_date.isoformat()
 
-            # Vérification si aujourd'hui
+            current_date_str = (
+                current_date.isoformat()
+            )
+
+
             today = date.today()
 
-            is_today = current_date == today
+            is_today = (
+                current_date == today
+            )
 
-            # ==================================================
-            # CONTENEUR DU JOUR
-            # ==================================================
 
+            # ------------------------------------------------
+            # Affichage du jour
+            # ------------------------------------------------
             if is_today:
 
                 st.markdown(
@@ -553,11 +662,10 @@ for week in weeks:
                     """,
                     unsafe_allow_html=True
                 )
-
-
-            # ==================================================
-            # ACTIVITÉS DU JOUR
-            # ==================================================
+            
+            # ------------------------------------------------
+            # Activités du jour
+            # ------------------------------------------------
 
             day_activities = activities_by_date.get(
                 current_date_str,
@@ -567,13 +675,14 @@ for week in weeks:
 
             for activity in day_activities:
 
-                render_activity_line(activity)
+                render_activity_line(
+                    activity
+                )
 
 
-            # ==================================================
-            # BOUTON AJOUTER
-            # ==================================================
-
+            # ------------------------------------------------
+            # Bouton ajouter
+            # ------------------------------------------------
             if st.button(
                 "＋ Ajouter",
                 key=f"add_{current_date_str}",
@@ -585,7 +694,6 @@ for week in weeks:
                 )
 
                 st.rerun()
-
 
 # ============================================================
 # AJOUT D'UNE ACTIVITÉ
@@ -693,7 +801,15 @@ if st.session_state.selected_date:
                 st.info(description)
 
 
+        # ----------------------------------------------------
+        # Aperçu activité
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # Boutons
+        # ----------------------------------------------------
+
         col_add, col_cancel = st.columns(2)
+
 
         with col_add:
 
@@ -708,11 +824,14 @@ if st.session_state.selected_date:
                     st.session_state.selected_date
                 )
 
+
                 st.success(
                     "Séance ajoutée au calendrier !"
                 )
 
+
                 st.session_state.selected_date = None
+
 
                 st.rerun()
 
@@ -726,4 +845,4 @@ if st.session_state.selected_date:
 
                 st.session_state.selected_date = None
 
-                st.rerun() 
+                st.rerun()
