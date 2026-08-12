@@ -3,7 +3,23 @@ import sqlite3
 import calendar
 from datetime import date
 from pathlib import Path
+import json
 
+
+# ------------------------------------------------------------------
+# 1️⃣  Chargement du fichier JSON (mise en cache)
+# ------------------------------------------------------------------
+#@st.cache_data(show_spinner=False)   # cache pour ne charger le fichier qu'une fois
+def load_user_data() -> dict:
+    """Lit le fichier users.json et renvoie le dictionnaire complet."""
+    file_path = Path(__file__).parent.parent / "users.json"   # à la racine du projet
+    if not file_path.is_file():
+        st.error(f"❌ Le fichier {file_path} est introuvable.")
+        return {}
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+USER_DB = load_user_data()   # dictionnaire global
 
 # ============================================================
 # CONFIGURATION
@@ -61,21 +77,60 @@ st.markdown(
 )
 
 
-st.subheader("👤 Utilisateur")
+## ============================================================
+## SÉLECTION DE LA BASE
+## ============================================================
+with st.container(border=True):                 # <‑ contexte « container » (facultatif)
+    # ── Votre code d'origine ───────────────────────
+    selected_user = st.selectbox(
+        "👤 Utilisateur",
+        options=list(DATABASES.keys()),
+        placeholder="Choisissez votre profil"
+    )
 
-selected_user = st.selectbox(
-    "Sélectionner l'utilisateur",
-    options=list(DATABASES.keys())
-)
+    DB_NAME = DATABASES[selected_user]
 
+    st.caption(f"Base utilisée : `{DB_NAME}`")
+    # ────────────────────────────────────────────────
 
-# Base actuellement utilisée
-DB_NAME = DATABASES[selected_user]
+    # ------------------------------------------------------------------
+    # 3️⃣  Récupération et affichage de la fiche utilisateur
+    # ------------------------------------------------------------------
+    # On enlève le suffixe « .db »
+    stem = Path(DB_NAME).stem
+    # On retire le pré‑fixe « training_ » 
+    key = stem.removeprefix("training_")
 
+    user_info = USER_DB.get(key)
 
-st.caption(
-    f"Base utilisée : `{DB_NAME}`"
-)
+    if user_info is None:
+        st.warning("⚠️ Aucune information disponible pour cet utilisateur.")
+    else:
+        # Mise en forme « beau » avec colonnes
+        col1, col2 = st.columns([1, 2], gap="small")
+
+        # Colonne 1 : Photo / Emoji + quelques stats rapides
+        with col1:
+            st.metric("Âge", f"{user_info['age']} ans")
+            st.metric("Taille", f"{user_info['taille_cm']} cm")
+            st.metric("Poids", f"{user_info['poids_kg']} kg")
+            st.metric("Sexe", user_info['sexe'])
+
+        # Colonne 2 : Texte détaillé
+        with col2:
+            full_name = f"{user_info['prenom']} {user_info['nom']}"
+            nickname  = user_info.get('surnom')
+            bodycount = user_info.get('bodycount')
+            description = user_info.get('description', "")
+
+            # Titre + sous‑titre
+            st.markdown(f"### {full_name}  \n")
+            st.markdown(f"<h1 style='font-size:48px'>{user_info.get('emoji','🧑')}</h1>", unsafe_allow_html=True)
+            st.markdown(f"**Surnom** : *{nickname}*  \n"
+                        f"**Body‑count** : {bodycount}")
+
+            # Bloc description (markdown)
+            st.markdown(f"---\n{description}\n---")
 
 
 # ============================================================

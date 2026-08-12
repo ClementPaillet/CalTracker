@@ -12,7 +12,7 @@ import json
 # ------------------------------------------------------------------
 # 1️⃣  Chargement du fichier JSON (mise en cache)
 # ------------------------------------------------------------------
-@st.cache_data(show_spinner=False)   # cache pour ne charger le fichier qu'une fois
+#@st.cache_data(show_spinner=False)   # cache pour ne charger le fichier qu'une fois
 def load_user_data() -> dict:
     """Lit le fichier users.json et renvoie le dictionnaire complet."""
     file_path = Path(__file__).parent.parent / "users.json"   # à la racine du projet
@@ -110,7 +110,6 @@ with st.container(border=True):                 # <‑ contexte « container
 
         # Colonne 1 : Photo / Emoji + quelques stats rapides
         with col1:
-            st.markdown(f"<h1 style='font-size:48px'>{user_info.get('emoji','🧑')}</h1>", unsafe_allow_html=True)
             st.metric("Âge", f"{user_info['age']} ans")
             st.metric("Taille", f"{user_info['taille_cm']} cm")
             st.metric("Poids", f"{user_info['poids_kg']} kg")
@@ -124,8 +123,9 @@ with st.container(border=True):                 # <‑ contexte « container
             description = user_info.get('description', "")
 
             # Titre + sous‑titre
-            st.markdown(f"### {full_name}  \n"
-                        f"*{nickname}*  \n"
+            st.markdown(f"### {full_name}  \n")
+            st.markdown(f"<h1 style='font-size:48px'>{user_info.get('emoji','🧑')}</h1>", unsafe_allow_html=True)
+            st.markdown(f"**Surnom** : *{nickname}*  \n"
                         f"**Body‑count** : {bodycount}")
 
             # Bloc description (markdown)
@@ -959,7 +959,7 @@ if not running.empty:
 
             st.altair_chart(
                 chart,
-                use_container_width=True
+                width="stretch"
             )
 
 
