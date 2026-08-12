@@ -35,28 +35,33 @@ pg = st.navigation({
         )
     ],
     "Entraînement": [
-        st.Page(
-            "pages/sport_calendar.py",
-            title="Calendrier d'entraînements",
-            icon="📅"
-        ),
+        #st.Page(
+        #    "pages/sport_calendar.py",
+        #    title="Calendrier d'entraînements",
+        #    icon="📅"
+        #),
         st.Page(
             "pages/sport_calendar_copy.py",
             title="Calendrier d'entraînements",
             icon="📅"
         ),
+        #st.Page(
+        #    "pages/statistiques2.py",
+        #    title="Statistiques",
+        #    icon="📊"          # optionnel, ajoute un petit icône à droite du label
+        #),
         st.Page(
-            "pages/statistiques2.py",
+            "pages/statistiques3.py",
             title="Statistiques",
             icon="📊"          # optionnel, ajoute un petit icône à droite du label
         ),
+        #st.Page(
+        #    "pages/training.py",
+        #    title="Base d'entraînements",
+        #    icon="🏃"          # optionnel, ajoute un petit icône à droite du label
+        #),
         st.Page(
-            "pages/statistiques3.py",
-            title="Statistiques - perso",
-            icon="📊"          # optionnel, ajoute un petit icône à droite du label
-        ),
-        st.Page(
-            "pages/training.py",
+            "pages/training2.py",
             title="Base d'entraînements",
             icon="🏃"          # optionnel, ajoute un petit icône à droite du label
         )

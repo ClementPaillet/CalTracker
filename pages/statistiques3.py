@@ -89,7 +89,7 @@ def get_connection(db_name):
 # CHARGEMENT DES DONNÉES
 # ============================================================
 
-@st.cache_data
+#@st.cache_data
 def load_training_data(db_name):
 
     conn = get_connection(db_name)
@@ -136,7 +136,7 @@ def load_training_data(db_name):
 # CHARGEMENT DES SEGMENTS DE COURSE
 # ============================================================
 
-@st.cache_data
+#@st.cache_data
 def load_segments(db_name):
 
     conn = get_connection(db_name)

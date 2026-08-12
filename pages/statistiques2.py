@@ -31,7 +31,7 @@ def get_connection():
 # CHARGEMENT DES DONNÉES
 # ============================================================
 
-@st.cache_data
+#@st.cache_data
 def load_training_data():
 
     conn = get_connection()
@@ -78,7 +78,7 @@ def load_training_data():
 # CHARGEMENT DES SEGMENTS DE COURSE
 # ============================================================
 
-@st.cache_data
+#@st.cache_data
 def load_segments():
 
     conn = get_connection()
