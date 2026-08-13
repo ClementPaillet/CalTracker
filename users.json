@@ -22,5 +22,17 @@
     "bodycount": 19,
     "emoji": "☭🟥",
     "description": "Impatience dans le coeur, discipline dans le corps."
+  },
+  "sara": {
+    "nom": "Bassanetti",
+    "prenom": "Sara",
+    "surnom": "Sasuke",
+    "age": 26,
+    "taille_cm": 174,
+    "poids_kg": 85,
+    "sexe": "F",
+    "bodycount": 16,
+    "emoji": "🍏",
+    "description": "En pleine crise de la 30aine: repeint son appart + prépare un Hyrox "
   }
 }
