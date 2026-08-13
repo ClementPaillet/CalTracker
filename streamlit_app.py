@@ -65,7 +65,14 @@ pg = st.navigation({
             title="Base d'entraînements",
             icon="🏃"          # optionnel, ajoute un petit icône à droite du label
         )
-    ]
+    ],
+    "Profils": [
+        st.Page(
+            "pages/edit_profile.py",
+            title="Crée ou édite ton profil",
+            icon="🔧"
+        )
+    ],
 }
 )
 
